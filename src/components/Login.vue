@@ -24,7 +24,9 @@
               <v-btn v-if="!valid" href="http://www.google.com">Help</v-btn>
             </v-layout>
         </v-form>
+        <div><v-btn><v-icon>android</v-icon>Download</v-btn><v-btn><v-icon>phone_iphone</v-icon>Download</v-btn></div>
       </v-layout>
+
       </v-flex>
     </v-app>
   </div>
@@ -52,14 +54,13 @@ export default {
         email: this.email,
         pass: this.password
       }).then(result => {
-        console.log(result)
         this.$root.token = result.body.token
         this.$root.user = result.body.user
         this.$root.logged = true
         this.$router.push('/profile')
       }).catch(error => {
         console.log(error)
-        alert(error.statusText);
+        alert(error.body.message);
       })
     },
     signup: function() {
@@ -67,14 +68,13 @@ export default {
       email: this.email,
       pass: this.password
     }).then(result => {
-      console.log(result)
       this.$root.token = result.body.token
       this.$root.user = result.body.user
       this.$root.logged = true
       this.$router.push('/profile')
     }).catch(error => {
       console.log(error)
-      alert(error.statusText);
+      alert(error.body.message);
     })
   }
   }
@@ -85,6 +85,11 @@ export default {
 #formular{
   padding: 100px;
   width: 600px;
+}
+div{
+  display:block;
+  text-align:center;
+  margin: 0 auto;
 }
 
 </style>

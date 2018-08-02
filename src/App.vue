@@ -7,7 +7,7 @@
       <v-spacer></v-spacer>
       <v-toolbar-items>
         <v-btn v-if="!this.$root.token" to="/login" exact><v-icon left>arrow_right</v-icon>Sign in</v-btn>
-        <v-btn to="/profile" exact><v-icon left>home</v-icon>Home</v-btn>
+        <v-btn v-if="this.$root.token" to="/profile" exact><v-icon left>home</v-icon>Home</v-btn>
         <v-btn to="/aboutus" exact><v-icon left>description</v-icon>About Us</v-btn>
       </v-toolbar-items>
     </v-toolbar>
@@ -19,10 +19,9 @@
 </template>
 
 <script>
-import Login from './components/Login.vue'
+
 export default {
   components: {
-    'login': Login
   },
   name: 'App',
   methods: {
@@ -34,7 +33,10 @@ export default {
 <style scoped>
 
 .v-btn--active{
-  background-color: #444;
+  background-color: grey;
+}
+.v-btn{
+  color: black;
 }
 
 </style>

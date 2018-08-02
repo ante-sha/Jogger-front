@@ -12,7 +12,7 @@
           class="elevation-1"
         >
           <template slot="items" slot-scope="props">
-            <td>{{ props.item.week }} {{ props.item.year }}</td>
+            <td>{{ props.item.fromTo }}</td>
             <td>{{ props.item.avgS }}</td>
             <td>{{ props.item.duration }}</td>
             <td>{{ props.item.length }}</td>
@@ -37,10 +37,9 @@ export default {
       {
             text: 'Date',
             align: 'left',
-            sortable: false,
-            value: 'name'
+            value: 'fromTo'
           },
-          { text: 'Average speed (km/h)', value: 'avgS' },
+          { text: 'Average speed (m/s)', value: 'avgS' },
           { text: 'Overall duration (min)', value: 'duration' },
           { text: 'OverAll length (m)', value: 'length'}
     ]
@@ -55,11 +54,15 @@ export default {
     this.$http.get('http://localhost:3000/reports/' + this.$route.params.id, {
       headers: {Authorization: 'Bearer ' + this.$root.token}
     }).then(res => {
-      console.log(res)
       this.reports = res.body.report || []
       for (let i=0; i<this.reports.length; i++){
-        this.reports[i].avgS = this.reports[i].length*60/this.reports[i].duration/1000
+        this.reports[i].avgS = this.reports[i].length/this.reports[i].duration/60
         this.reports[i].avgS = this.reports[i].avgS.toFixed(2)
+        var firstDayOfYear = new Date(this.reports[i].year, 0, 1)
+        var from = new Date(this.reports[i].year, 0, 1 + (this.reports[i].week) * 7 - firstDayOfYear.getDay())
+        var to = new Date(this.reports[i].year, from.getMonth(), from.getDate() + 7)
+        this.reports[i].fromTo = (from.getFullYear() + ' , ' + ("0" + (from.getMonth() + 1)).slice(-2) + ' , ' + ("0" + from.getDate()).slice(-2) + ' - ' +
+        to.getFullYear() + ' , ' + ("0" + (to.getMonth() + 1)).slice(-2) + ' , ' + ("0" + to.getDate()).slice(-2))
       }
     }).catch(err => {
       console.log(err)

@@ -14,16 +14,12 @@
                 <v-btn  class="light-green" v-on:click="rankUp(user,index)"><v-icon left>arrow_drop_up</v-icon>Rank up</v-btn>
                 <v-btn class="red accent-2" v-on:click="rankDown(user,index)"><v-icon left>arrow_drop_down</v-icon>Rank down</v-btn>
               </label>
-              <v-btn class="grey" v-on:click="deleteUser(user._id,index)"><v-icon left>clear</v-icon>Delete</v-btn>
+              <!-- <v-btn class="grey" v-on:click="deleteUser(user._id,index)"><v-icon left>clear</v-icon>Delete</v-btn> -->
+              <v-btn class="grey" v-bind:to="'/user/' + user._id"><v-icon left>person</v-icon>Profile</v-btn>
               <hr>
             </li>
           </ul>
         </v-flex>
-
-
-
-
-
     </v-app>
     <p>{{ Check() }}</p>
   </div>
@@ -37,15 +33,20 @@ export default {
   name: 'allUsers',
   methods: {
     rankUp(user, index){
-      this.$http.patch('http://localhost:3000/manage/promote',{
-        userId: user._id,
-        newRank: user.rank+1
-      } , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(
-        this.users[index].rank = user.rank+1
-      ).catch(err => {
-        console.log(err)
-        alert(err.statusText)
-      })
+      if (user.rank === 3) {
+        alert('You already made him admin')
+      } else {
+        this.$http.patch('http://localhost:3000/manage/promote',{
+          userId: user._id,
+          newRank: user.rank+1
+        } , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(
+          this.users[index].rank = user.rank+1
+        ).catch(err => {
+          console.log(err)
+          alert(err.statusText)
+        })
+      }
+
     },
     rankDown(user, index){
       if (user.rank === 1) {
@@ -65,14 +66,14 @@ export default {
     Check(){
       if(!this.$root.token) this.$router.push('/login')
     },
-    deleteUser(id,index){
-      this.$http.delete('http://localhost:3000/users/' + id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(
-        this.users.splice(index,1)
-      ).catch(err => {
-        console.log(err)
-        alert(err.statusText)
-      })
-    },
+    // deleteUser(id,index){
+    //   this.$http.delete('http://localhost:3000/users/' + id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(
+    //     this.users.splice(index,1)
+    //   ).catch(err => {
+    //     console.log(err)
+    //     alert(err.statusText)
+    //   })
+    // },
     visible(user){
       if (this.$root.user.rank === 2) return false;
       else return true;
@@ -81,7 +82,6 @@ export default {
   created() {
     this.$http.get('http://localhost:3000/users', {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
       this.users = res.body.users || []
-      console.log(this.users)
     }).catch(err => {
       console.log(err)
     })

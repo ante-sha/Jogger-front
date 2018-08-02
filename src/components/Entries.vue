@@ -2,12 +2,13 @@
   <div>
     <h1>{{ any() }}</h1>
     <v-flex>
+      <v-container padding="0px" class="text-xs-center"><v-btn class="light-blue" id="go" v-if="repBut" v-bind:to="'/reports/' + this.$route.params.id">Go to reports</v-btn></v-container>
       <ul v-if="!update">
         <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
-          <span>{{ index+1 }}.</span>
+          <div id="num">{{ index+1 }}.</div>
           <span>Date: {{ ent.date.split('T')[0] }}</span>
-          <span >Duration: {{ ent.duration }}min</span>
-          <span >Length: {{ ent.length }}m</span>
+          <div class="data" >Duration: {{ ent.duration }}min</div>
+          <div class="data" >Length: {{ ent.length }}m</div>
           <v-btn v-on:click="callUpdate(ent, index)"><v-icon>update</v-icon></v-btn>
           <v-btn v-on:click="delEntry(ent, index)"><v-icon>delete_forever</v-icon></v-btn>
           <hr>
@@ -29,12 +30,13 @@
       <li>
         <v-form>
           <v-btn v-on:click="update=!update">Back</v-btn>
+          <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
           <span>Date: <input type="date"  v-model="entry.date" required/></span>
           <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
           <span >Length: <input type="number" v-model="entry.length" required/>m</span>
           <hr>
         </v-form>
-        <v-btn v-on:click="Update"><v-icon>update</v-icon></v-btn>
+
       </li>
     </div>
     <p>{{ Check() }}</p>
@@ -45,6 +47,7 @@
 export default {
   data: () => ({
     newEnt: false,
+    repBut: true,
     tmp: -1,
     entry: {},
     today: new Date(),
@@ -76,8 +79,14 @@ export default {
       if(!this.$root.token) this.$router.push('/login')
     },
     any(){
-      if(this.entryArr === undefined || this.entryArr.length === 0) return 'There is no entries!'
-      else return ''
+      if(this.entryArr === undefined || this.entryArr.length === 0) {
+        this.repBut = false;
+        return 'There is no entries!'
+      } else {
+        this.repBut = true;
+        if(this.$route.params.id === this.$root.user._id) return 'Your entries'
+        else return 'Users entries'
+      }
     },
     send(){
       if(this.newEntry.newDate && this.newEntry.newLength && this.newEntry.newDuration){
@@ -101,7 +110,6 @@ export default {
         },
         {headers: {Authorization: 'Bearer ' + this.$root.token}}
       ).then(res => {
-        console.log(res)
         this.entryArr.splice(this.tmp,1,this.entry)
         this.update = false;
       }).catch(err => {
@@ -126,14 +134,35 @@ export default {
 </script>
 
 <style scoped>
+.light-blue{
+  color: black;
+  font-size: 16px;
+}
 h1{
   text-align: center;
 }
-
+#num{
+  margin: 0px 10px;
+  width: 30px;
+  display: inline-block;
+  border-right: 1px solid;
+}
+#go{
+  text-align: center;
+  margin: 10px auto;
+  width: 140px;
+}
 #add{
   width: 200px;
   text-align: center;
   margin: 0 auto;
+}
+.data{
+  width: 150px;
+  display:inline-block;
+  padding: 5px;
+  font-size: 16px;
+  border-right-style: solid;
 }
 span{
   border-right-style: solid;

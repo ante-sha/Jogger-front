@@ -5,10 +5,10 @@
       <ul v-if="!update">
         <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
           <v-btn v-bind:to="'/user/' + ent.userId">See profile</v-btn>
-          <span>{{ index+1 }}.</span>
-          <span>Date: {{ ent.date.split('T')[0] }}</span>
-          <span >Duration: {{ ent.duration }}min</span>
-          <span >Length: {{ ent.length }}m</span>
+          <div id="num">{{ index+1 }}.</div>
+          <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
+          <div class="data" >Duration: {{ ent.duration }}min</div>
+          <div class="data" >Length: {{ ent.length }}m</div>
           <v-btn v-on:click="callUpdate(ent, index)"><v-icon>update</v-icon></v-btn>
           <v-btn v-on:click="delEntry(ent, index)"><v-icon>delete_forever</v-icon></v-btn>
           <hr>
@@ -19,12 +19,14 @@
       <li>
         <v-form>
           <v-btn v-on:click="update=!update">Back</v-btn>
-          <span>Date: <input type="date"  v-model="entry.date" required/></span>
+          <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
+          <span >Date: <input type="date"  v-model="entry.date" required/></span>
           <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
           <span >Length: <input type="number" v-model="entry.length" required/>m</span>
+
           <hr>
         </v-form>
-        <v-btn v-on:click="Update"><v-icon>update</v-icon></v-btn>
+
       </li>
     </div>
     <p>{{ Check() }}</p>
@@ -86,7 +88,6 @@ export default {
         },
         {headers: {Authorization: 'Bearer ' + this.$root.token}}
       ).then(res => {
-        console.log(res)
         this.entryArr.splice(this.tmp,1,this.entry)
         this.update = false;
       }).catch(err => {
@@ -101,7 +102,6 @@ export default {
 
   created() {
     this.$http.get('http://localhost:3000/manage/entry' , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
-      console.log(res)
       this.entryArr = res.body.Entries || []
     }).catch(err => {
       console.log(err)
@@ -115,13 +115,22 @@ export default {
 h1{
   text-align: center;
 }
-
+#num{
+  margin: 0px 10px;
+  width: 30px;
+  display: inline-block;
+  border-right: 1px solid;
+}
 #add{
   width: 200px;
   text-align: center;
   margin: 0 auto;
 }
-span{
+.data{
+  width: 150px;
+  display:inline-block;
+  padding: 5px;
+  font-size: 16px;
   border-right-style: solid;
 }
 
@@ -137,7 +146,6 @@ input[type="number"]{
 li {
   display: block;
   margin: 0 auto;
-  text-align: center;
   padding: 10px 5px 5px 5px;
   border-style: solid;
   border-width: 2px;
@@ -146,12 +154,13 @@ span{
   margin: 10px auto;
   padding: 5px;
   font-size: 16px;
+  border-right-style: solid;
 }
 ul{
   margin-top: 30px;
 }
-.v-btn{
-  width: 30px;
+#date{
+  width: 200px;
 }
 
 </style>

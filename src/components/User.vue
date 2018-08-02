@@ -16,16 +16,10 @@
           <div>
             <hr>
             <v-layout align-start justify-end row fill-height>
-              <v-btn class="grey" v-on:click="deleteUser()">Delete your account</v-btn>
+              <v-btn class="grey" v-on:click="deleteUser()">{{ text() }}</v-btn>
             </v-layout>
           </div>
         </v-flex>
-
-
-
-
-
-
     </v-app>
     <p>{{ Check() }}</p>
   </div>
@@ -44,6 +38,10 @@ export default {
   }),
   name: 'User',
   methods: {
+    text(){
+      if(this.$route.params.id === this.$root.user._id) return 'Delete your account'
+      else return 'Delete users account'
+    },
     getRank(){
       if (this.user.rank === 1) return 'Trainee';
       else if (this.user.rank === 2) return 'Agent';
@@ -55,8 +53,8 @@ export default {
     },
     deleteUser(){
       this.$http.delete('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
-        this.$root.token = ''
-        this.$router.push('/login')
+        if(this.$route.params.id === this.$root.user._id) this.$root.token = ''
+        else this.$router.push('/allUsers')
       }).catch(err => {
         console.log(err)
         alert(err.statusText)
@@ -65,7 +63,6 @@ export default {
   },
   created(){
     this.$http.get('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
-      console.log(res)
       this.user = res.body
     }).catch(err => {
       console.log(err)
