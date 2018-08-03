@@ -1,8 +1,9 @@
 <template>
   <div>
+    <v-app v-bind:style="this.$root.background">
     <h1>{{ any() }}</h1>
     <v-flex>
-      <v-container padding="0px" class="text-xs-center"><v-btn class="light-blue" id="go" v-if="repBut" v-bind:to="'/reports/' + this.$route.params.id">Go to reports</v-btn></v-container>
+      <v-container pt-2 pb-1 class="text-xs-center"><v-btn class="light-blue" id="go" v-if="repBut" v-bind:to="'/reports/' + this.$route.params.id">Go to reports</v-btn></v-container>
       <ul v-if="!update">
         <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
           <div id="num">{{ index+1 }}.</div>
@@ -21,29 +22,28 @@
             <span >Length: <input type="number"  v-model="newEntry.newLength" required/>m</span>
             <v-btn v-on:click="send()" class="green">Add</v-btn>
             <hr>
-
           </form>
         </li>
       </ul>
+      <div v-if="update">
+        <li>
+          <v-form>
+            <v-btn v-on:click="update=!update">Back</v-btn>
+            <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
+            <span>Date: <input type="date"  v-model="entry.date" required/></span>
+            <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
+            <span >Length: <input type="number" v-model="entry.length" required/>m</span>
+            <hr>
+          </v-form>
+        </li>
+      </div>
     </v-flex>
-    <div v-if="update">
-      <li>
-        <v-form>
-          <v-btn v-on:click="update=!update">Back</v-btn>
-          <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
-          <span>Date: <input type="date"  v-model="entry.date" required/></span>
-          <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
-          <span >Length: <input type="number" v-model="entry.length" required/>m</span>
-          <hr>
-        </v-form>
-
-      </li>
-    </div>
-    <p>{{ Check() }}</p>
+    </v-app>
   </div>
 </template>
 
 <script>
+import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
     newEnt: false,
@@ -75,9 +75,6 @@ export default {
         alert(err.statusText)
       })
     },
-    Check(){
-      if(!this.$root.token) this.$router.push('/login')
-    },
     any(){
       if(this.entryArr === undefined || this.entryArr.length === 0) {
         this.repBut = false;
@@ -97,39 +94,45 @@ export default {
           date: this.newEntry.newDate
         }, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
           this.entryArr.push( { _id: res.body._id, userId: res.body.userId, duration: res.body.duration, length: res.body.length, date: res.body.date
-        })}).catch(err => alert(err.statusText))
+        })}).catch(err => alert(err.body.message))
       } else {
         alert('Enter all fields')
       }
     },
     Update(){
-      this.$http.patch('http://localhost:3000/entry/' + this.entry._id,{
-          newDuration: this.entry.duration,
-          newLength: this.entry.length,
-          newDate: this.entry.date
-        },
-        {headers: {Authorization: 'Bearer ' + this.$root.token}}
-      ).then(res => {
-        this.entryArr.splice(this.tmp,1,this.entry)
-        this.update = false;
-      }).catch(err => {
-        console.log(err)
-        alert(err.statusText)
-      })
+      if(this.entry.length && this.entry.duration && this.entry.date >= '2018-08-01') {
+        this.$http.patch('http://localhost:3000/entry/' + this.entry._id,{
+            newDuration: this.entry.duration,
+            newLength: this.entry.length,
+            newDate: this.entry.date
+          },
+          {headers: {Authorization: 'Bearer ' + this.$root.token}}
+        ).then(res => {
+          this.entryArr.splice(this.tmp,1,this.entry)
+          this.update = false;
+        }).catch(err => {
+          console.log(err)
+          alert(err.statusText)
+        })
+      } else {
+        alert('Enter valid data in all fields')
+      }
+
     }
   },
   computed: {
 
   },
-
+  mixins: [logCheck],
   created() {
-    this.$http.get('http://localhost:3000/entry/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
-      this.entryArr = res.body.entry || []
-    }).catch(err => {
-      console.log(err)
-    })
+    if (this.Check()) {
+      this.$http.get('http://localhost:3000/entry/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
+        this.entryArr = res.body.entry || []
+      }).catch(err => {
+        console.log(err)
+      })
+    }
   }
-
 }
 </script>
 
@@ -140,6 +143,8 @@ export default {
 }
 h1{
   text-align: center;
+  margin-top: 15px;
+  text-decoration: underline;
 }
 #num{
   margin: 0px 10px;
@@ -184,6 +189,7 @@ li {
   padding: 10px 5px 5px 5px;
   border-style: solid;
   border-width: 2px;
+  background-color: rgba(255,255,255,0.7);
 }
 span{
   margin: 10px auto;
@@ -191,7 +197,8 @@ span{
   font-size: 16px;
 }
 ul{
-  margin-top: 30px;
+  margin-top: 20px;
+  padding: 10px;
 }
 .v-btn{
   width: 30px;

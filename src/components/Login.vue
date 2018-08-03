@@ -1,8 +1,7 @@
 <template>
-  <div>
-  </keepalive>
-    <v-app>
+    <v-app v-bind:style="this.$root.background + ' width:60%;'">
       <v-flex>
+        <h1>Login/Singup</h1>
         <v-layout align-center justify-center row fill-height >
         <v-form v-model="valid" id="formular">
           <v-text-field
@@ -29,7 +28,6 @@
 
       </v-flex>
     </v-app>
-  </div>
 </template>
 
 <script>
@@ -82,9 +80,15 @@ export default {
 </script>
 
 <style scoped>
+h1{
+  text-align: center;
+  margin-top: 15px;
+  text-decoration: underline;
+}
 #formular{
-  padding: 100px;
-  width: 600px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  width: 100%;
 }
 div{
   display:block;

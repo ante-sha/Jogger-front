@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <v-app>
-
+    <v-app v-bind:style="this.$root.background">
         <v-flex>
           <v-layout align-start justify-center row fill-height>
           <span><img v-bind:src="source[user.rank]"/></span>
@@ -11,7 +9,6 @@
             <p>Exp: </p>
             <p>Level: </p>
           </span>
-
           </v-layout >
           <div>
             <hr>
@@ -21,11 +18,10 @@
           </div>
         </v-flex>
     </v-app>
-    <p>{{ Check() }}</p>
-  </div>
 </template>
 
 <script>
+import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
     source: [
@@ -48,9 +44,6 @@ export default {
       else if(this.user.rank === 3) return 'Director';
       else return 'Error'
     },
-    Check(){
-      if(!this.$root.token) this.$router.push('/login')
-    },
     deleteUser(){
       this.$http.delete('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
         if(this.$route.params.id === this.$root.user._id) this.$root.token = ''
@@ -61,13 +54,16 @@ export default {
       })
     }
   },
+  mixins: [logCheck],
   created(){
-    this.$http.get('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
-      this.user = res.body
-    }).catch(err => {
-      console.log(err)
-      alert(err.statusText)
-    })
+    if (this.Check()) {
+      this.$http.get('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
+        this.user = res.body
+      }).catch(err => {
+        console.log(err)
+        alert(err.statusText)
+      })
+    }
   }
 }
 </script>

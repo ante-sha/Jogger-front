@@ -1,19 +1,22 @@
 <template>
   <div>
+    <v-app v-bind:style="this.$root.background">
     <h1>{{ any() }}</h1>
     <v-flex>
+      <v-layout align-top justify-center row fill-height pt-1 >
       <ul v-if="!update">
         <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
-          <v-btn v-bind:to="'/user/' + ent.userId">See profile</v-btn>
-          <div id="num">{{ index+1 }}.</div>
-          <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
-          <div class="data" >Duration: {{ ent.duration }}min</div>
-          <div class="data" >Length: {{ ent.length }}m</div>
-          <v-btn v-on:click="callUpdate(ent, index)"><v-icon>update</v-icon></v-btn>
-          <v-btn v-on:click="delEntry(ent, index)"><v-icon>delete_forever</v-icon></v-btn>
-          <hr>
-        </li>
-      </ul>
+            <v-btn class="grey" v-bind:to="'/user/' + ent.userId"><v-icon left>person</v-icon>Profile</v-btn>
+            <div id="num">{{ index+1 }}.</div>
+            <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
+            <div class="data" >Duration: {{ ent.duration }}min</div>
+            <div class="data" >Length: {{ ent.length }}m</div>
+            <v-btn v-on:click="callUpdate(ent, index)"><v-icon>update</v-icon></v-btn>
+            <v-btn v-on:click="delEntry(ent, index)"><v-icon>delete_forever</v-icon></v-btn>
+            <hr>
+          </li>
+        </ul>
+      </v-layout>
     </v-flex>
     <div v-if="update">
       <li>
@@ -29,11 +32,13 @@
 
       </li>
     </div>
-    <p>{{ Check() }}</p>
+    {{ Check() }}
+  </v-app>
   </div>
 </template>
 
 <script>
+import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
     newEnt: false,
@@ -59,12 +64,9 @@ export default {
         alert(err.statusText)
       })
     },
-    Check(){
-      if(!this.$root.token) this.$router.push('/login')
-    },
     any(){
       if(this.entryArr === undefined || this.entryArr.length === 0) return 'There is no entries!'
-      else return ''
+      else return 'All entries'
     },
     // send(){
     //   if(this.newEntry.newDate && this.newEntry.newLength && this.newEntry.newDuration){
@@ -99,7 +101,7 @@ export default {
   computed: {
 
   },
-
+  mixins: [logCheck],
   created() {
     this.$http.get('http://localhost:3000/manage/entry' , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
       this.entryArr = res.body.Entries || []
@@ -114,6 +116,8 @@ export default {
 <style scoped>
 h1{
   text-align: center;
+  margin-top: 15px;
+  text-decoration: underline;
 }
 #num{
   margin: 0px 10px;
@@ -149,6 +153,7 @@ li {
   padding: 10px 5px 5px 5px;
   border-style: solid;
   border-width: 2px;
+  background-color: rgba(255,255,255,0.7);
 }
 span{
   margin: 10px auto;
@@ -158,9 +163,13 @@ span{
 }
 ul{
   margin-top: 30px;
+  padding: 0 12px;
 }
 #date{
   width: 200px;
+}
+.v-btn{
+  color: black;
 }
 
 </style>

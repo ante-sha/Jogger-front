@@ -1,11 +1,8 @@
 <template>
-  <div>
-    <v-app>
-      <v-layout align-top justify-center row fill-height pt-5 >
-
-
+    <v-app v-bind:style="this.$root.background">
+      <h1>About us</h1>
+      <v-layout align-top justify-center row fill-height pt-3 >
           <div class="wrap">
-            <h1>About us</h1>
             <div id="frame">
               <p>We are company that inspires people, boosts their dreams.</p>
               <p>
@@ -21,15 +18,9 @@
           <div><v-btn><v-icon>android</v-icon>Download</v-btn><v-btn><v-icon>phone_iphone</v-icon>Download</v-btn></div>
             <span>For your personal trainer contact us at: jogger@jogger.com</span>
             <hr>
-
           </div>
-
       </v-layout>
-
-
     </v-app>
-
-  </div>
 </template>
 
 <script>
@@ -45,6 +36,9 @@ export default {
 </script>
 
 <style scoped>
+
+
+
 #frame{
   padding: 20px;
   background-image: url("../assets/top.jpg");
@@ -55,7 +49,7 @@ export default {
   font-size: 14px;
 }
 span{
-  color: black;
+  color: white;
   font-weight: bold;
   font-size: 14px;
 }
@@ -68,6 +62,11 @@ span{
 
 div{
   padding: 10px;
+}
+h1{
+  text-align: center;
+  margin: 15px auto;
+  text-decoration: underline;
 }
 
 </style>

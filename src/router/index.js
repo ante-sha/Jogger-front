@@ -21,6 +21,10 @@ export default new Router({
     { path: '/allUsers', component: allUsers },
     { path: '/user/:id', component: User },
     { path: '/aboutus', component: AboutUs },
-    { path: '/allEntries', component: allEntries }
+    { path: '/allEntries', component: allEntries },
+    { path: '*', redirect(to) {
+      alert('Page not found')
+      return '/aboutus'
+    }}
   ]
 })
