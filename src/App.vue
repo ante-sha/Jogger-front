@@ -7,7 +7,8 @@
       <v-toolbar-title>JOGGER</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
-        <v-btn v-if="!this.$root.token" to="/login" left exact><v-icon left>arrow_right</v-icon>Sign in</v-btn>
+        <v-btn v-if="!this.$root.token" to="/signup" left exact><v-icon left>create</v-icon>Sign Up</v-btn>
+        <v-btn v-if="!this.$root.token" to="/login" left exact><v-icon left>arrow_right</v-icon>Login</v-btn>
         <v-btn v-if="this.$root.token" to="/profile" left exact><v-icon left>home</v-icon>Home</v-btn>
         <v-btn to="/aboutus" left exact><v-icon left>description</v-icon>About Us</v-btn>
       </v-toolbar-items>

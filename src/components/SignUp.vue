@@ -1,9 +1,10 @@
 <template>
     <v-app v-bind:style="this.$root.background + ' width:60%;'">
       <v-flex>
-        <h1>Login</h1>
+        <h1>Singup</h1>
         <v-layout align-center justify-center row fill-height >
-        <v-form v-model="valid" id="formular">
+        <h3 v-if="open">Please validate your email on your email.</h3>
+        <v-form v-model="valid" id="formular" v-if="!open">
           <v-text-field
             v-model="email"
             :rules="emailRules"
@@ -18,11 +19,11 @@
             required
             ></v-text-field>
             <v-layout  align-center justify-end row fill-height >
-              <v-btn dark v-if="valid" v-on:click="login">Login</v-btn>
+              <v-btn light v-if="valid" v-on:click="signup">Sign up</v-btn>
               <v-btn v-if="!valid" href="http://www.google.com">Help</v-btn>
             </v-layout>
         </v-form>
-        <div><v-btn><v-icon>android</v-icon>Download</v-btn><v-btn><v-icon>phone_iphone</v-icon>Download</v-btn></div>
+        <div v-if="!open"><v-btn><v-icon>android</v-icon>Download</v-btn><v-btn><v-icon>phone_iphone</v-icon>Download</v-btn></div>
       </v-layout>
 
       </v-flex>
@@ -33,6 +34,7 @@
 export default {
   data: () => ({
     valid: false,
+    open: false,
     email: '',
     emailRules: [
       v => !!v || 'E-mail is required',
@@ -44,27 +46,27 @@ export default {
       v => v.length >= 6 || 'Min 6 characters'
     ]
   }),
-  name: 'Login',
+  name: 'SignUp',
   methods: {
-    login: function() {
-      this.$http.post('http://localhost:3000/users/login',{
-        email: this.email,
-        pass: this.password
-      }).then(result => {
-        this.$root.token = result.body.token
-        this.$root.user = result.body.user
-        this.$root.logged = true
-        this.$router.push('/profile')
-      }).catch(error => {
-        console.log(error)
-        alert(error.body.message);
-      })
-    }
+    signup: function() {
+    this.$http.post('http://localhost:3000/users/signup',{
+      email: this.email,
+      pass: this.password
+    }).then(result => {
+      this.open = true
+    }).catch(error => {
+      console.log(error)
+      alert(error.body.message);
+    })
+  }
   }
 }
 </script>
 
 <style scoped>
+h3{
+  margin-top:50px;
+}
 h1{
   text-align: center;
   margin-top: 15px;

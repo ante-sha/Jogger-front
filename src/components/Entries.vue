@@ -1,29 +1,37 @@
 <template>
-  <div>
     <v-app v-bind:style="this.$root.background">
     <h1>{{ any() }}</h1>
     <v-flex>
-      <v-container pt-2 pb-1 class="text-xs-center"><v-btn class="light-blue" id="go" v-if="repBut" v-bind:to="'/reports/' + this.$route.params.id">Go to reports</v-btn></v-container>
+      <v-container pt-2 pb-1 class="text-xs-center"><v-btn dark id="go" v-if="repBut" v-bind:to="'/reports/' + this.$route.params.id">Go to reports</v-btn></v-container>
       <ul v-if="!update">
-        <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
-          <div id="num">{{ index+1 }}.</div>
-          <span>Date: {{ ent.date.split('T')[0] }}</span>
-          <div class="data" >Duration: {{ ent.duration }}min</div>
-          <div class="data" >Length: {{ ent.length }}m</div>
-          <v-btn v-on:click="callUpdate(ent, index)"><v-icon>update</v-icon></v-btn>
-          <v-btn v-on:click="delEntry(ent, index)"><v-icon>delete_forever</v-icon></v-btn>
-          <hr>
-        </li>
-        <li v-if="!newEnt"><v-btn id="add" class="green"  v-on:click="fun()" >Add new entry</v-btn></li>
+        <li v-if="!newEnt"><v-btn id="add" class="green lighten-2"  v-on:click="fun()" >Add new entry</v-btn></li>
         <li  v-if="newEnt">
         <form>
             <span>Date: <input type="date" v-model="newEntry.newDate" required/></span>
             <span >Duration: <input type="number"v-model="newEntry.newDuration" required/>min</span>
             <span >Length: <input type="number"  v-model="newEntry.newLength" required/>m</span>
-            <v-btn v-on:click="send()" class="green">Add</v-btn>
+            <v-btn v-on:click="send()" class="green lighten-2">Add</v-btn>
             <hr>
           </form>
         </li>
+        <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in tmpEntryArr">
+          <div id="num">{{ (index+1) + (page - 1) * count }}.</div>
+          <span>Date: {{ ent.date.split('T')[0] }}</span>
+          <div class="data" >Duration: {{ ent.duration }}min</div>
+          <div class="data" >Length: {{ ent.length }}m</div>
+          <div>
+          <v-btn v-on:click="callUpdate(ent, index + (page - 1) * count)"><v-icon>update</v-icon></v-btn>
+          <v-btn v-on:click="delEntry(ent, index + (page - 1) * count)"><v-icon>delete_forever</v-icon></v-btn>
+          </div>
+          <hr>
+        </li>
+        <div class="text-xs-center">
+          <v-pagination
+          color="black"
+          v-model="page"
+          :length="numOfPag"
+          ></v-pagination>
+        </div>
       </ul>
       <div v-if="update">
         <li>
@@ -39,7 +47,6 @@
       </div>
     </v-flex>
     </v-app>
-  </div>
 </template>
 
 <script>
@@ -53,9 +60,24 @@ export default {
     today: new Date(),
     newEntry: {},
     entryArr: [],
+    tmpEntryArr: [],
+    page: 1,
+    numOfPag: 0,
+    count: 7,
     update: false
   }),
   name: 'Entries',
+  watch: {
+    page(){
+      this.tmpEntryArr = this.entryArr.slice(this.count * (this.page - 1), (this.count * this.page))
+    },
+    entryArr(){
+      this.tmpEntryArr = this.entryArr.slice(this.count * (this.page - 1), (this.count * this.page))
+      this.numOfPag = Math.ceil(this.entryArr.length / this.count)
+      if (this.page > this.numOfPag) this.page = this.numOfPag
+      if (this.entryArr.length === 1 ) this.page = 1
+    }
+  },
   methods: {
     fun(){
       this.newEnt=true;
@@ -93,8 +115,10 @@ export default {
           length: this.newEntry.newLength,
           date: this.newEntry.newDate
         }, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
-          this.entryArr.push( { _id: res.body._id, userId: res.body.userId, duration: res.body.duration, length: res.body.length, date: res.body.date
-        })}).catch(err => alert(err.body.message))
+          this.newEnt = false
+          this.entryArr.push({ _id: res.body._id, userId: res.body.userId, duration: res.body.duration, length: res.body.length, date: res.body.date })
+          alert('Entry posted!')
+        }).catch(err => alert(err.body.message))
       } else {
         alert('Enter all fields')
       }
@@ -130,6 +154,8 @@ export default {
         this.entryArr = res.body.entry || []
       }).catch(err => {
         console.log(err)
+        alert(err.statusText)
+        if(err.status === 401) this.$router.push('/login')
       })
     }
   }

@@ -1,35 +1,72 @@
 <template>
-  <div>
     <v-app v-bind:style="this.$root.background">
         <v-flex>
           <h1>All managable users</h1>
-          <ul>
+          <!-- <ul>
             <li v-for="(user,index) in users">
               <span> {{ index+1 }}.</span>
-              <v-btn v-bind:to="'/entry/users/' + user._id"><v-icon left>list</v-icon>Entries</v-btn>
-              <v-btn v-bind:to="'/reports/' + user._id"><v-icon left>reorder</v-icon>Report</v-btn>
+              <v-btn dark v-bind:to="'/entry/users/' + user._id"><v-icon left>list</v-icon>Entries</v-btn>
+              <v-btn dark v-bind:to="'/reports/' + user._id"><v-icon left>reorder</v-icon>Report</v-btn>
               <div id="email">Email: {{ user.email }}</div>
               <span >Rank: {{ user.rank }}.</span>
               <br>
               <label v-if="visible(user)">
-                <v-btn  class="light-green" v-on:click="rankUp(user,index)"><v-icon left>arrow_drop_up</v-icon>Rank up</v-btn>
-                <v-btn class="red accent-2" v-on:click="rankDown(user,index)"><v-icon left>arrow_drop_down</v-icon>Rank down</v-btn>
+                <v-btn  class="green lighten-2" v-on:click="rankUp(user,index)"><v-icon left>arrow_drop_up</v-icon>Rank up</v-btn>
+                <v-btn class="red lighten-3" v-on:click="rankDown(user,index)"><v-icon left>arrow_drop_down</v-icon>Rank down</v-btn>
               </label>
-              <v-btn class="grey" v-bind:to="'/user/' + user._id"><v-icon left>person</v-icon>Profile</v-btn>
+              <v-btn light v-bind:to="'/user/' + user._id"><v-icon left>person</v-icon>Profile</v-btn>
               <hr>
             </li>
+          </ul> -->
+
+          <ul>
+            <li v-for="(user,index) in tmpUsers">
+              <span> {{ index+1 + (page - 1) * count }}.</span>
+              <v-btn v-if="user.verify" dark v-bind:to="'/entry/users/' + user._id"><v-icon left>list</v-icon>Entries</v-btn>
+              <v-btn v-if="user.verify" dark v-bind:to="'/reports/' + user._id"><v-icon left>reorder</v-icon>Report</v-btn>
+              <span v-if="!user.verify">Not verified!</span>
+              <div id="email">Email: {{ user.email }}</div>
+              <span >Rank: {{ user.rank }}.</span>
+              <br>
+              <label v-if="visible(user)">
+                <v-btn  class="green lighten-2" v-on:click="rankUp(user,index + (page - 1) * count)"><v-icon left>arrow_drop_up</v-icon>Rank up</v-btn>
+                <v-btn class="red lighten-3" v-on:click="rankDown(user,index + (page - 1) * count)"><v-icon left>arrow_drop_down</v-icon>Rank down</v-btn>
+              </label>
+              <v-btn light v-bind:to="'/user/' + user._id"><v-icon left>person</v-icon>Profile</v-btn>
+              <hr>
+            </li>
+            <div class="text-xs-center">
+              <v-pagination
+              color="black"
+              v-model="page"
+              :length="numOfPag"
+              ></v-pagination>
+            </div>
           </ul>
         </v-flex>
     </v-app>
-  </div>
 </template>
 
 <script>
 import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
+    page: 1,
+    numOfPag: 0,
+    tmpUsers: [],
+    count: 6,
     users: []
   }),
+  watch: {
+    page(){
+      this.tmpUsers = this.users.slice(this.count * (this.page - 1), (this.count * this.page))
+    },
+    users(){
+      this.numOfPag = Math.ceil(this.users.length / this.count)
+      this.tmpUsers = this.users.slice(this.count * (this.page - 1), (this.count * this.page))
+      if (this.page > this.numOfPag) this.page = this.numOfPag
+    }
+  },
   name: 'allUsers',
   methods: {
     rankUp(user, index){

@@ -18,7 +18,7 @@ new Vue({
       token: '',
       user: {},
       logged: false,
-      background: 'background-image: url(http://sayforward.com/sites/default/files/ext_image/173cba18155e21564ba37e30a1f6d308.jpg?1270618257); background-size: 2000px; background-repeat: no-repeat; background-position:top; border-left: 3px solid; border-right: 3px solid;'
+      background: 'background-image: url(http://sayforward.com/sites/default/files/ext_image/173cba18155e21564ba37e30a1f6d308.jpg?1270618257); background-size: 2000px; background-repeat: no-repeat; background-position:top; border-left: 3px solid; border-right: 3px solid; width: 60%;'
     }
   },
   http: {

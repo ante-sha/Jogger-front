@@ -1,21 +1,69 @@
 <template>
     <v-app v-bind:style="this.$root.background">
         <v-flex>
-          <v-layout align-start justify-center row fill-height>
-          <span><img v-bind:src="source[user.rank]"/></span>
-          <span>
-            <p>Email: {{ user.email }}</p>
-            <p>Rank: {{ getRank() }}</p>
-            <p>Exp: </p>
-            <p>Level: </p>
-          </span>
+          <v-layout align-center justify-center column fill-height>
+            <h1>User data</h1>
+            <div class="window re">
+              <img v-bind:src="source[user.rank]"/>
+
+              <div class="data re">
+                <p>Email: {{ user.email }}</p>
+                <p>Rank: {{ getRank() }}</p>
+                <p v-if="!user.verify">Account not verified</p>
+                <p v-if="user.verify">Exp: </p>
+                <p v-if="user.verify">Level: </p>
+              </div>
+            </div>
           </v-layout >
-          <div>
-            <hr>
-            <v-layout align-start justify-end row fill-height>
-              <v-btn class="grey" v-on:click="deleteUser()">{{ text() }}</v-btn>
-            </v-layout>
-          </div>
+          <hr>
+          <!-- <div class="text-xs-center"><v-btn class="blue-grey lighten-4 del" v-on:click="deleteUser()">{{ text() }}</v-btn></div> -->
+          <div class="text-xs-center" v-if="this.$route.params.id !== this.$root.user._id">
+            <v-dialog
+            v-model="dialog"
+            width="300"
+            >
+            <v-btn
+            slot="activator"
+            color="blue-grey lighten-4"
+            light
+            >
+              Delete Users Account
+            </v-btn>
+
+            <v-card>
+              <v-card-title
+              class="headline grey lighten-2"
+              primary-title
+              >
+                Warning!
+              </v-card-title>
+
+              <v-card-text>
+                When you delete account, data is irretrivable.<br>Do you want to continue?
+              </v-card-text>
+
+              <v-divider></v-divider>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                color="primary"
+                flat
+                @click="deleteUser()"
+                >
+                  Yes
+                </v-btn>
+                <v-btn
+                color="primary"
+                flat
+                @click="dialog = false"
+                >
+                  No
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
         </v-flex>
     </v-app>
 </template>
@@ -24,6 +72,7 @@
 import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
+    dialog: false,
     source: [
       '',
       'http://www.coastalbend.edu/uploadedImages/CBC/Content/Student_Services/Tutoring/stick_figure_covered_books_1600_clr_9024.png',
@@ -34,10 +83,6 @@ export default {
   }),
   name: 'User',
   methods: {
-    text(){
-      if(this.$route.params.id === this.$root.user._id) return 'Delete your account'
-      else return 'Delete users account'
-    },
     getRank(){
       if (this.user.rank === 1) return 'Trainee';
       else if (this.user.rank === 2) return 'Agent';
@@ -57,6 +102,7 @@ export default {
   mixins: [logCheck],
   created(){
     if (this.Check()) {
+      this.dialog = false
       this.$http.get('http://localhost:3000/users/' + this.$route.params.id, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res =>{
         this.user = res.body
       }).catch(err => {
@@ -69,8 +115,10 @@ export default {
 </script>
 
 <style scoped>
-v-btn{
-  right: 10%
+h1{
+  text-align: center;
+  margin-top: 15px;
+  text-decoration: underline;
 }
 
 p{
@@ -80,18 +128,28 @@ p{
   margin: 10px;
   text-align: center;
 }
-span{
-  display: inline-block;
-  margin-right: 50px;
-}
+
+
 img{
-  max-width: 200px;
+  display: inline-block;
+  width: 35%;
   max-height: 300px;
+  margin: 20px 0;
+}
+.window{
+  margin: 20px auto;
+  padding: 0;
+}
+.re{
+  padding: 10px;
+  display: inline-block;
+  text-align: center;
+}
+.data{
+  position: relative;
+  top: -50px;
 }
 
-div{
-  padding: 10px;
-}
 
 
 </style>

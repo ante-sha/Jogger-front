@@ -1,12 +1,11 @@
 <template>
-  <div>
     <v-app v-bind:style="this.$root.background">
     <h1>{{ any() }}</h1>
-    <v-flex>
+    <!-- <v-flex>
       <v-layout align-top justify-center row fill-height pt-1 >
       <ul v-if="!update">
         <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in entryArr">
-            <v-btn class="grey" v-bind:to="'/user/' + ent.userId"><v-icon left>person</v-icon>Profile</v-btn>
+            <v-btn class="blue-grey lighten-4" v-bind:to="'/user/' + ent.userId"><v-icon left>person</v-icon>Profile</v-btn>
             <div id="num">{{ index+1 }}.</div>
             <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
             <div class="data" >Duration: {{ ent.duration }}min</div>
@@ -17,24 +16,45 @@
           </li>
         </ul>
       </v-layout>
-    </v-flex>
-    <div v-if="update">
-      <li>
-        <v-form>
-          <v-btn v-on:click="update=!update">Back</v-btn>
-          <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
-          <span >Date: <input type="date"  v-model="entry.date" required/></span>
-          <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
-          <span >Length: <input type="number" v-model="entry.length" required/>m</span>
-
+    </v-flex> -->
+    <v-flex v-if="!update">
+    <ul >
+      <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in visEntryArr">
+          <div id="num">{{ (index+1) + (page - 1) * count }}.</div>
+          <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
+          <div class="data" >Duration: {{ ent.duration }}min</div>
+          <div class="data" >Length: {{ ent.length }}m</div>
+          <div>
+          <v-btn v-on:click="callUpdate(ent, index + (page - 1) * count)"><v-icon>update</v-icon></v-btn>
+          <v-btn v-on:click="delEntry(ent, index + (page - 1) * count)"><v-icon>delete_forever</v-icon></v-btn>
+          <v-btn class="blue-grey lighten-4" v-bind:to="'/user/' + ent.userId"><v-icon left>person</v-icon>Profile</v-btn>
+          </div>
           <hr>
-        </v-form>
+        </li>
+        <div class="text-xs-center">
+          <v-pagination
+          color="black"
+          v-model="page"
+          :length="numOfPag"
+          ></v-pagination>
+        </div>
+      </ul>
+      </v-flex>
+      <div v-if="update">
+        <li>
+          <v-form>
+            <v-btn v-on:click="update=!update">Back</v-btn>
+            <v-btn v-on:click="Update" right><v-icon>update</v-icon></v-btn>
+            <span >Date: <input type="date"  v-model="entry.date" required/></span>
+            <span >Duration: <input type="number" v-model="entry.duration" required/>min</span>
+            <span >Length: <input type="number" v-model="entry.length" required/>m</span>
 
-      </li>
-    </div>
-    {{ Check() }}
+            <hr>
+          </v-form>
+
+        </li>
+      </div>
   </v-app>
-  </div>
 </template>
 
 <script>
@@ -42,13 +62,27 @@ import logCheck from '../mixins/logCheck'
 export default {
   data: () => ({
     newEnt: false,
+    page: 1,
+    numOfPag: 0,
+    count: 8,
     tmp: -1,
     entry: {},
     newEntry: {},
     entryArr: [],
+    visEntryArr: [],
     update: false
   }),
   name: 'Entries',
+  watch: {
+    page(){
+      this.visEntryArr = this.entryArr.slice(8 * (this.page - 1), (8 * this.page))
+    },
+    entryArr(){
+      this.visEntryArr = this.entryArr.slice(8 * (this.page - 1), (8 * this.page))
+      this.numOfPag = Math.ceil(this.entryArr.length / this.count)
+      if (this.page > this.numOfPag) this.page = this.numOfPag
+    }
+  },
   methods: {
     callUpdate(entry,index){
       this.update = true;
@@ -103,11 +137,13 @@ export default {
   },
   mixins: [logCheck],
   created() {
-    this.$http.get('http://localhost:3000/manage/entry' , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
-      this.entryArr = res.body.Entries || []
-    }).catch(err => {
-      console.log(err)
-    })
+    if (this.Check()) {
+      this.$http.get('http://localhost:3000/manage/entry' , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
+        this.entryArr = res.body.Entries || []
+      }).catch(err => {
+        console.log(err)
+      })
+    }
   }
 
 }
@@ -171,5 +207,8 @@ ul{
 .v-btn{
   color: black;
 }
-
+div{
+  text-align: center;
+  
+}
 </style>
