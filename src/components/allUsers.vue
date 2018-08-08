@@ -25,6 +25,7 @@
               <v-btn v-if="user.verify" dark v-bind:to="'/entry/users/' + user._id"><v-icon left>list</v-icon>Entries</v-btn>
               <v-btn v-if="user.verify" dark v-bind:to="'/reports/' + user._id"><v-icon left>reorder</v-icon>Report</v-btn>
               <span v-if="!user.verify">Not verified!</span>
+              <v-btn v-if="!user.verify" v-on:click="resend(user._id)" outline style="height: 33px; bottom: 2px;">Resend mail</v-btn>
               <div id="email">Email: {{ user.email }}</div>
               <span >Rank: {{ user.rank }}.</span>
               <br>
@@ -68,7 +69,19 @@ export default {
     }
   },
   name: 'allUsers',
+  computed: {
+
+  },
   methods: {
+    resend(tmp){
+      this.$http.post('http://localhost:3000/manage/verify', {userId: tmp}, {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
+          alert('Email has been send!')
+      }).catch(err => {
+        console.log(err)
+        alert(err.statusText)
+      })
+
+      },
     rankUp(user, index){
       if (user.rank === 3) {
         alert('You already made him admin')
@@ -76,9 +89,13 @@ export default {
         this.$http.patch('http://localhost:3000/manage/promote',{
           userId: user._id,
           newRank: user.rank+1
-        } , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(
-          this.users[index].rank = user.rank+1
-        ).catch(err => {
+        } , {headers: {Authorization: 'Bearer ' + this.$root.token}}).then(res => {
+          if (user.rank === 2) {
+            alert('You made ' + this.users[index].email + ' admin!')
+            this.users.splice(index,1)
+          }
+          else this.users[index].rank = user.rank+1
+        }).catch(err => {
           console.log(err)
           alert(err.statusText)
         })
@@ -152,7 +169,6 @@ ul{
   margin-top: 30px;
   padding: 0 12px;
 }
-
 
 
 </style>
