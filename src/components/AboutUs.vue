@@ -67,6 +67,7 @@ h1{
   text-align: center;
   margin: 15px auto;
   text-decoration: underline;
+  cursor: default;
 }
 
 </style>

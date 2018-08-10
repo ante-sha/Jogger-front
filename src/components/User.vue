@@ -119,6 +119,7 @@ h1{
   text-align: center;
   margin-top: 15px;
   text-decoration: underline;
+  cursor: default;
 }
 
 p{

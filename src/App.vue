@@ -33,6 +33,9 @@ export default {
 </script>
 
 <style scoped>
+.v-toolbar__title{
+  cursor: default;
+}
 #app{
   margin: 0 auto;
   background-color: #e2e2e2;
