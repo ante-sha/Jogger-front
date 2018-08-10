@@ -14,8 +14,8 @@
           <template slot="items" slot-scope="props">
             <td>From: {{ props.item.fromTo.split('P')[0] }}<br>To: {{ props.item.fromTo.split('P')[1] }}</td>
             <td class="miso text-xs-center">{{ props.item.avgS }}</td>
-            <td class="text-xs-center">{{ props.item.duration }}</td>
-            <td class="text-xs-center">{{ props.item.length }}</td>
+            <td class="text-xs-center">{{ Math.floor(props.item.duration) }}</td>
+            <td class="text-xs-center">{{ Math.floor(props.item.length) }}</td>
           </template>
         </v-data-table>
         <div class="text-xs-center pt-2">

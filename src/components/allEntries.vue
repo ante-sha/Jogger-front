@@ -22,8 +22,8 @@
       <li v-if="entryArr !== undefined && entryArr.length !== 0" v-for="(ent,index) in visEntryArr">
           <div id="num">{{ (index+1) + (page - 1) * count }}.</div>
           <span id="date">Date: {{ ent.date.split('T')[0] }}</span>
-          <div class="data" >Duration: {{ ent.duration }}min</div>
-          <div class="data" >Length: {{ ent.length }}m</div>
+          <div class="data" >Duration: {{ Math.floor(ent.duration) }}min</div>
+          <div class="data" >Length: {{ Math.floor(ent.length) }}m</div>
           <div>
           <v-btn v-on:click="callUpdate(ent, index + (page - 1) * count)"><v-icon>update</v-icon></v-btn>
           <v-btn v-on:click="delEntry(ent, index + (page - 1) * count)"><v-icon>delete_forever</v-icon></v-btn>
@@ -209,6 +209,6 @@ ul{
 }
 div{
   text-align: center;
-  
+
 }
 </style>
